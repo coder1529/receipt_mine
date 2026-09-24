@@ -2,6 +2,7 @@
 // This is the file to edit. p5.js reference: https://p5js.org/reference/
 import JsBarcode from "jsbarcode";
 import dogPhotoUrl from "./assets/dog-cherry-blossoms.jpg";
+import hackClubLogoUrl from "./assets/hack-club-2026.svg";
 
 export const receipt = {
   height: 1610, // 240–2000 px. Width is fixed by the printer.
@@ -144,6 +145,19 @@ function drawPolaroid(p, w, margin, top) {
     p.line(cx, cy, cx, cy + tick * dy);
   });
 
+  // A Hack Club sticker, slapped on the corner like the README promised.
+  ensureHackClubLogo(p);
+  if (hackClubLogo) {
+    const stickerW = 72;
+    const stickerH = stickerW * (hackClubLogo.height / hackClubLogo.width);
+    p.push();
+    p.translate(photoX + photoW - stickerW * 0.4, photoY + photoH - stickerH * 0.55);
+    p.rotate(-0.16);
+    p.imageMode(p.CENTER);
+    p.image(hackClubLogo, 0, 0, stickerW, stickerH);
+    p.pop();
+  }
+
   p.noStroke();
   p.fill(0);
   p.textFont("monospace");
@@ -159,6 +173,24 @@ const DOG_PHOTO_ASPECT = 1125 / 1500; // source photo's width / height
 let dogImage = null;
 let dogImageRequested = false;
 let ditheredDogPhoto = null;
+
+let hackClubLogo = null;
+let hackClubLogoRequested = false;
+
+function ensureHackClubLogo(p) {
+  if (hackClubLogo || hackClubLogoRequested) return;
+  hackClubLogoRequested = true;
+  p.loadImage(
+    hackClubLogoUrl,
+    (img) => {
+      hackClubLogo = img;
+      if (typeof p.redraw === "function") p.redraw();
+    },
+    (err) => {
+      console.error("Failed to load Hack Club logo", err);
+    }
+  );
+}
 
 function ensureDogImage(p) {
   if (dogImage || dogImageRequested) return;
